@@ -19,6 +19,8 @@ app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
   });
 
+  const names = [];
+
 app.get('/', (req,res) => {
     console.log("Hello World");
     res.status(200).send({"message":"hello world"});
@@ -37,7 +39,8 @@ app.get('/:name', (req,res) => {
 app.post('/newName', (req,res) =>{
     const newUser = req.query.name;
     console.log('You made a new user. It is >>>', newUser);
-    res.status(201).send(newUser)
+    names.push(newUser);
+    res.status(201).send({"list":names})
 })
 
 
