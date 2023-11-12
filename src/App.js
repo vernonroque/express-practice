@@ -1,7 +1,7 @@
 import React, {useState,useEffect} from 'react';
 //import logo from './logo.svg';
 //import { Counter } from './features/counter/Counter';
-import './App.css';
+import styles from './App.module.css';
 //import { Form } from 'react-router-dom';
 
 function App() {
@@ -12,6 +12,11 @@ function App() {
   const [loadingMessage,setLoadingMessage] = useState(true);
   const [listOfNames, setListOfNames] = useState([]);
   //const [i,setI] = useState(0);
+  const [loadingList,setLoadingList] = useState(true);
+  const [newNameData,setNewNameData] = useState(
+    {targetName:'',
+      newName:'' }
+    );
 
   useEffect(()=>{
 
@@ -33,10 +38,20 @@ function App() {
 
   },[message]);
 
+  const fetchNames = async() => {
+    const response = await fetch('http://localhost:4001/totalList');
+    const jsonResponse = await response.json();
+    console.log("jsonResponse of list >>>", jsonResponse.list);
+    jsonResponse.list.map(element => setListOfNames([...listOfNames,element]));
+
+  }
+
   useEffect(()=>{
 
-    setListOfNames(prevList => [...prevList,name]);
-
+    
+    // setListOfNames(prevList => [...prevList,name]);
+    fetchNames();
+    setLoadingList(false);
 
   },[name])
 
@@ -47,7 +62,7 @@ function App() {
     const value = parentElement.querySelector('input').value;
 
 
-    console.log('Im in the handleSubmit function. The value is >>>', value);
+    // console.log('Im in the handleSubmit function. The value is >>>', value);
 
     const response = await fetch(`http://localhost:4001/newName?name=${value}`,{method: 'POST'});
     const jsonResponse = await response.json();
@@ -65,12 +80,46 @@ function App() {
     //   });
   } 
 
-  // const handleChange = (e) => {
+  const handleUpdateForm = (e) =>{
+    e.preventDefault();
 
-  //   setName(e.target.value);
-  //   // setLoading(true);
+    const updateName = () => {
+      fetch(`http://localhost:4001/updateName?targetName=${newNameData.targetName}&newName=${newNameData.newName}`,{
+        method:'PUT'
+      })
+      .then(response=> {
+        try{
+          const jsonResponse = response.json();
+          return jsonResponse;
+        }catch{
+          console.log("There was an error >>>", response.error);
+        }
+      })
+      .then(jsonResponse => {
+        jsonResponse.list.map(element => setListOfNames([...listOfNames,element]))
 
-  // }
+      })
+
+    }
+
+
+
+
+
+  }
+
+  const handleChange = (e) => {
+
+    const {name,value} = e.target;
+
+    setNewNameData({
+      ...newNameData,
+      [name]:value
+    })
+
+
+  }
+
 
 
     return(
@@ -83,14 +132,32 @@ function App() {
         {loading ? <h1>Still loading ....</h1> : <h1>The name is {name}</h1>}
         {loadingMessage ? <h1>Still loading message ...</h1> : <h1>The message is {message}</h1>}
 
-        <h2>The list of names: </h2>
-        {listOfNames.map(element=> <h2>{element}</h2>)}
-        
 
-      
+        {loadingList ? <h1>Currently loading list</h1>:
+          <>
+             <h2>The list of names: </h2>
+                <ol className = {styles.unorderedList}>
+                   {listOfNames.map((element,i)=> <li key = {i} >{element}</li>)}
+               </ol>
+          </>
+        }
+
+        <h1>Update a name here: </h1>
+        <form className={styles.updateForm} onSubmit={handleUpdateForm}>
+          <label for="targetName">What name do you want to replace?</label>
+          <input type="text" 
+                name="targetName" 
+                value={newNameData.targetName} 
+                onChange = {handleChange}
+                />
+
+          <label for="newName">Replace with what name?</label>
+          <input type="text" name="newName" value={newNameData.newName} onChange = {handleChange} />
+
+          <button className = {styles.updateButton} type="submit">Update now</button>
+
+        </form>
       </>
-
-
     )
 
 

@@ -4,9 +4,9 @@ const express = require('express');
 const cors = require('cors');
 // Instantiate the app here
 const app = express(); 
-
-
 app.use(cors());
+
+const {findElementByName} = require('./utils.js')
 
 
 const PORT = process.env.PORT || 4001;
@@ -32,6 +32,12 @@ app.get('/query', (req,res) => {
     res.status(200).send(`Hello ${req.query.value} and ${req.query.number}`);
 })
 
+app.get('/totalList', (req,res)=>{
+    console.log("Fetching list of all names...");
+    res.status(200).send({"list":names})
+
+})
+
 app.get('/:name', (req,res) => {
     console.log(`Hello ${req.params.name}`);
     res.status(200).send({"message":`Hello ${req.params.name}`});
@@ -41,6 +47,12 @@ app.post('/newName', (req,res) =>{
     console.log('You made a new user. It is >>>', newUser);
     names.push(newUser);
     res.status(201).send({"list":names})
+})
+
+app.put('/updateName', (req,res) => {
+    
+
+
 })
 
 
