@@ -19,7 +19,7 @@ app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
   });
 
-  const names = [];
+  let names = [];
 
 app.get('/', (req,res) => {
     console.log("Hello World");
@@ -50,9 +50,14 @@ app.post('/newName', (req,res) =>{
 })
 
 app.put('/updateName', (req,res) => {
-    
 
+    console.log("Updating the name...");
+   const updatedNames = findElementByName(req.query.targetName,req.query.newName,names);
 
+   names = [...updatedNames];
+   console.log("The new name array>>>",names);
+
+   res.status(201).send({"list":names});
 })
 
 

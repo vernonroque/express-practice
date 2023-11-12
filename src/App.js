@@ -6,6 +6,7 @@ import styles from './App.module.css';
 
 function App() {
 
+  const [inputName,setInputName] = useState('');
   const [name,setName] =useState('');
   const [loading,setLoading] = useState(true);
   const [message,setMessage] = useState('');
@@ -42,7 +43,8 @@ function App() {
     const response = await fetch('http://localhost:4001/totalList');
     const jsonResponse = await response.json();
     console.log("jsonResponse of list >>>", jsonResponse.list);
-    jsonResponse.list.map(element => setListOfNames([...listOfNames,element]));
+
+    setListOfNames([...jsonResponse.list]);
 
   }
 
@@ -58,13 +60,13 @@ function App() {
   const handleSubmit = async(e) => {
     e.preventDefault();
 
-    const parentElement = document.querySelector(".nameForm");
-    const value = parentElement.querySelector('input').value;
+    // const parentElement = document.querySelector(".nameForm");
+    // const value = parentElement.querySelector('input').value;
 
 
     // console.log('Im in the handleSubmit function. The value is >>>', value);
 
-    const response = await fetch(`http://localhost:4001/newName?name=${value}`,{method: 'POST'});
+    const response = await fetch(`http://localhost:4001/newName?name=${inputName}`,{method: 'POST'});
     const jsonResponse = await response.json();
 
     console.log("jsonResponse>>>>", jsonResponse);
@@ -72,6 +74,7 @@ function App() {
     const arrayLength = jsonResponse.list.length;
     setName(jsonResponse.list[arrayLength - 1]);
     setLoading(false);
+    setInputName('');
     // setI(prevI => 
     //   {
     //     console.log("The previous value is >>>", prevI);
@@ -88,24 +91,30 @@ function App() {
         method:'PUT'
       })
       .then(response=> {
-        try{
-          const jsonResponse = response.json();
-          return jsonResponse;
-        }catch{
-          console.log("There was an error >>>", response.error);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        return response.json();
       })
       .then(jsonResponse => {
-        jsonResponse.list.map(element => setListOfNames([...listOfNames,element]))
+        //jsonResponse.list.map(element => setListOfNames([...listOfNames,element]))
+        setListOfNames([...jsonResponse.list]);
 
       })
-
     }
 
+    updateName();
 
+    setNewNameData({
+      targetName:'',
+      newName:''
+    })
 
-
-
+  }
+  const handleName = e => {
+    console.log("The e value >>>", e.target);
+    const {value} = e.target;
+    setInputName(value);
   }
 
   const handleChange = (e) => {
@@ -116,16 +125,17 @@ function App() {
       ...newNameData,
       [name]:value
     })
-
-
   }
-
-
 
     return(
       <>
         <form className = "nameForm" onSubmit={handleSubmit}>
-          <input type="text" className="name" placeholder="Please enter a name" />
+          <input type="text" 
+                 className="name" 
+                 placeholder="Please enter a name" 
+                 value={inputName}
+                 onChange = {handleName}
+                 />
 
         </form>
 
