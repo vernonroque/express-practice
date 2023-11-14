@@ -33,8 +33,20 @@
   flex-direction:column;
   line-height: 3;
 }
+.deleteForm{
+  display:flex;
+  justify-content:flex-start;
+  align-items:flex-start;
+  flex-direction:column;
+  line-height: 3;
+
+}
 .updateButton{
   margin-top: 20px;
+}
+.deleteButton{
+  margin-top: 20px;
+
 }
 
 @keyframes App-logo-float {

@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express(); 
 app.use(cors());
 
-const {findElementByName} = require('./utils.js')
+const {findElementByName, findElementIndex} = require('./utils.js')
 
 
 const PORT = process.env.PORT || 4001;
@@ -58,6 +58,18 @@ app.put('/updateName', (req,res) => {
    console.log("The new name array>>>",names);
 
    res.status(201).send({"list":names});
+})
+
+app.delete('/deleteName', (req,res) => {
+    console.log("Deleting the name...");
+    const value = req.query.deleteName;
+
+    const index= findElementIndex(value,names);
+
+    names.splice(index,1);
+
+    res.status(200).send({"list":names})
+
 })
 
 

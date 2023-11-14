@@ -18,7 +18,9 @@ function App() {
     {targetName:'',
       newName:'' }
     );
-
+  const [deleteName,setDeleteName] = useState('');
+  const [deleteOfficial,setDeleteOfficial] = useState('');
+  const [deleteSuccess,setDeleteSuccess] = useState(false);
   useEffect(()=>{
 
     const fetchName = async() =>{
@@ -111,12 +113,44 @@ function App() {
     })
 
   }
+  const handleDeleteForm = (e) => {
+    e.preventDefault();
+
+    setDeleteOfficial(deleteName);
+
+    fetch(`http://localhost:4001/deleteName?deleteName=${deleteName}`,{
+      method:'DELETE'
+    })
+    .then(response =>{
+      if(response.ok)
+        return response.json();
+      else
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    })
+    .then(jsonResponse => {
+      setListOfNames([...jsonResponse.list])
+    })
+
+    setDeleteSuccess(true);
+
+    setDeleteName('');
+    
+    setTimeout(()=>{
+      setDeleteSuccess(false);
+    },3000)
+
+  }
+  const handleDeleteInput = e => {
+
+    const {value} = e.target;
+    setDeleteName(value);
+
+  }
   const handleName = e => {
-    console.log("The e value >>>", e.target);
+    //console.log("The e value >>>", e.target);
     const {value} = e.target;
     setInputName(value);
   }
-
   const handleChange = (e) => {
 
     const {name,value} = e.target;
@@ -133,6 +167,7 @@ function App() {
           <input type="text" 
                  className="name" 
                  placeholder="Please enter a name" 
+                 name="nameInput"
                  value={inputName}
                  onChange = {handleName}
                  />
@@ -165,8 +200,20 @@ function App() {
           <input type="text" name="newName" value={newNameData.newName} onChange = {handleChange} />
 
           <button className = {styles.updateButton} type="submit">Update now</button>
-
         </form>
+
+        <h1>Delete a name here: </h1>
+        <form className = {styles.deleteForm} onSubmit = {handleDeleteForm}>
+          <label for = "deleteName">What name do you wanna delete?</label>
+          <input type="text" 
+                 name = "deleteName" 
+                 value={deleteName} 
+                 onChange={handleDeleteInput}
+                 />
+          <button className = {styles.deleteButton} type = "submit">Delete name</button>
+
+       </form>
+       {deleteSuccess?<h1>You deleted {deleteOfficial}</h1>: ''}
       </>
     )
 

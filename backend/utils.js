@@ -20,6 +20,14 @@ const findElementByName = (targetName,newName,namesArr) => {
     
 }
 
+const findElementIndex = (name,namesArr) => {
+
+    const index = namesArr.indexOf(name);
+
+    return index;
+}
+
 module.exports = {
-    findElementByName:findElementByName
+    findElementByName:findElementByName,
+    findElementIndex: findElementIndex
 }
